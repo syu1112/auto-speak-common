@@ -1,0 +1,1 @@
+# auto-speak-common
