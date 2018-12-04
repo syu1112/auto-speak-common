@@ -1,6 +1,8 @@
 package com.allen.auto.speak;
 
-import com.allen.auto.speak.utils.ClipboardUtil;
+import com.allen.auto.speak.ts.TSPlug;
+import com.allen.auto.speak.ts.TSWindow;
+import com.jacob.com.Dispatch;
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
 
@@ -25,6 +27,9 @@ public class Main extends JFrame implements ActionListener {
 
     private JTextArea jTextArea;
     private JTextField jTextField;
+    private JTextField jTextField2;
+
+    private int hwnd = 0;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -53,10 +58,10 @@ public class Main extends JFrame implements ActionListener {
         jLabel.setForeground(Color.red);
         jPanel.add(jLabel);
 
-        JLabel jLabel2 = new JLabel("Wait Time:");
+        JLabel jLabel2 = new JLabel("Wait Time(s):");
         jPanel.add(jLabel2);
         jTextField = new JTextField();
-        jTextField.setColumns(5);
+        jTextField.setColumns(3);
         jTextField.setText("10");
         jTextField.addKeyListener(new KeyAdapter(){
             public void keyTyped(KeyEvent e) {
@@ -67,13 +72,19 @@ public class Main extends JFrame implements ActionListener {
             }
         });
         jPanel.add(jTextField);
-        JLabel jLabel3 = new JLabel("s");
-        jPanel.add(jLabel3);
 
-        jTextArea = new JTextArea(8, 26);
+        JLabel jLabelWt = new JLabel("Window Title:");
+        jPanel.add(jLabelWt);
+        jTextField2 = new JTextField();
+        jTextField2.setText("微信");
+        jTextField2.setColumns(5);
+        jPanel.add(jTextField2);
+
+
+        jTextArea = new JTextArea(7, 26);
         jTextArea.setText("Please input contents...");
         jTextArea.setLineWrap(true); //激活自动换行功能
-        jTextArea.setWrapStyleWord(true);    // 激活断行不断字功能
+        jTextArea.setWrapStyleWord(true);    //激活断行不断字功能
         JScrollPane sp = new JScrollPane(jTextArea);
         sp.setBounds(5, 45, 650, 400);
         jPanel.add(sp);
@@ -90,22 +101,36 @@ public class Main extends JFrame implements ActionListener {
                             System.err.println("invalid operation! because the program is running");
                             break;
                         }
+                        String windowTitle = jTextField2.getText();
+                        if(null == windowTitle || "".equals(windowTitle)) {
+                            JOptionPane.showMessageDialog(null,"Please input window title!", "提示", JOptionPane.WARNING_MESSAGE);
+                            break;
+                        }
+                        //获取句柄
+                        hwnd = TSWindow.find("", windowTitle);
+                        //判断窗口是否存在
+                        if(!TSWindow.getState(hwnd, 0)) {
+                            JOptionPane.showMessageDialog(null,"Program not running!", "提示", JOptionPane.WARNING_MESSAGE);
+                            return;
+                        }
                         //开始自动喊话
                         main.setTitle("[STATUS]: runing...");  //更改窗口标题为当前状态
                         jTextArea.setEnabled(false); //设置不可修改
                         jTextField.setEnabled(false); //设置不可修改
-                        ClipboardUtil.setClipbordContents(jTextArea.getText());  //将喊话内容复制到粘贴板
-                        System.out.println(Integer.parseInt(jTextField.getText()));
-                        AutoSpeakTask.getInstance().start(Integer.parseInt(jTextField.getText()));  //根据喊话间隔，定时执行喊话内容
+                        jTextField2.setEnabled(false); //设置不可修改
+                        //根据喊话间隔，定时执行喊话内容
+                        AutoSpeakTask.getInstance().start(hwnd, jTextArea.getText(), Integer.parseInt(jTextField.getText()));
                         break;
                     case GLOBAL_HOT_KEY_STOP:
                         if(AutoSpeakTask.flag) {
                             System.err.println("invalid operation! because the program is stop");
                             break;
                         }
+                        TSWindow.setState(hwnd, 9); //取消置顶
                         main.setTitle("[STATUS]: stop!"); //更改窗口标题为当前状态
                         jTextArea.setEnabled(true); //设置可修改
                         jTextField.setEnabled(true); //设置可修改
+                        jTextField2.setEnabled(true); //设置可修改
                         AutoSpeakTask.getInstance().destroyed();    //销毁定时任务
                         break;
                 }
@@ -125,84 +150,3 @@ public class Main extends JFrame implements ActionListener {
     }
 
 }
-
-
-//备忘按键的数值:
-//
-//public static final int F1 = 112;
-//
-//public static final int F2 = 113;
-//
-//public static final int F3 = 114;
-//
-//public static final int F4 = 115;
-//
-//public static final int F5 = 116;
-//
-//public static final int F6 = 117;
-//
-//public static final int F7 = 118;
-//
-//public static final int F8 = 119;
-//
-//public static final int F9 = 120;
-//
-//public static final int F10 = 121;
-//
-//public static final int F11 = 122;
-//
-//public static final int F12 = 123;
-//
-//public static final int ESC = 27;
-//
-//public static final int TAB = 9;
-//
-//public static final int CAPSLOCK = 20;
-//
-//public static final int SHIFT = 16;
-//
-//public static final int CTRL = 17;
-//
-//public static final int START_LEFT = 91;
-//
-//public static final int START_RIGHT = 92;
-//
-//public static final int CONTEXT_MENU = 93;
-//
-//public static final int ALT = 18;
-//
-//public static final int SPACE = 32;
-//
-//public static final int CARRIAGE_RETURN = 13;
-//
-//public static final int LINE_FEED = 10;
-//
-//public static final int BACK_SLASH = 220;
-//
-//public static final int BACK_SPACE = 8;
-//
-//public static final int INSERT = 45;
-//
-//public static final int DEL = 46;
-//
-//public static final int HOME = 36;
-//
-//public static final int END = 35;
-//
-//public static final int PAGE_UP = 33;
-//
-//public static final int PAGE_DOWN = 34;
-//
-//public static final int PRINT_SCREEN = 44;
-//
-//public static final int SCR_LK = 145;
-//
-//public static final int PAUSE = 19;
-//
-//public static final int LEFT_ARROW_KEY = 37;
-//
-//public static final int UP_ARROW_KEY = 38;
-//
-//public static final int RIGHT_ARROW_KEY = 39;
-//
-//public static final int DOWN_ARROW_KEY = 40;
