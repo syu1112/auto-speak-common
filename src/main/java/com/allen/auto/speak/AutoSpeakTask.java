@@ -1,6 +1,8 @@
 package com.allen.auto.speak;
 
-import com.allen.auto.speak.utils.DD;
+import com.allen.auto.speak.ts.TSKeyMouse;
+import com.allen.auto.speak.ts.TSPlug;
+import com.allen.auto.speak.ts.TSWindow;
 
 import java.util.Date;
 import java.util.Timer;
@@ -9,10 +11,11 @@ import java.util.TimerTask;
 public class AutoSpeakTask extends TimerTask {
     private Timer timer = null;
     private static AutoSpeakTask autoSpeakTask;
+    private int hwnd;
+    private String str;
     public static boolean flag = true;
 
     private AutoSpeakTask() {
-
     }
 
     //单例模式，保持这个对象
@@ -24,7 +27,9 @@ public class AutoSpeakTask extends TimerTask {
         return autoSpeakTask;
     }
 
-    public void start(int s) {
+    public void start(int hwnd, String str, int s) {
+        this.hwnd = hwnd;
+        this.str = str;
         if (timer == null) {
             timer = new Timer();
         } else {
@@ -36,17 +41,23 @@ public class AutoSpeakTask extends TimerTask {
     }
 
     public void run() {
-        //回车-输入文本
-        DD.INSTANCE.DD_key(313,1);
-        DD.INSTANCE.DD_key(313,2);
-        //粘贴
-        DD.INSTANCE.DD_key(600,1);
-        DD.INSTANCE.DD_key(504,1);
-        DD.INSTANCE.DD_key(600,2);
-        DD.INSTANCE.DD_key(504,2);
-        //回车-发送文本
-        DD.INSTANCE.DD_key(313,1);
-        DD.INSTANCE.DD_key(313,2);
+        //激活
+        TSWindow.setState(hwnd, 1);
+        //置顶
+        TSWindow.setState(hwnd, 8);
+        //恢复
+        TSWindow.setState(hwnd, 12);
+        //获取焦点
+        TSWindow.setState(hwnd, 15);
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        TSKeyMouse.pressChar("enter");
+        System.out.println("input:"+str+";result:"+TSPlug.sendString(hwnd, str));
+        TSKeyMouse.pressChar("enter");
+        TSWindow.setState(hwnd, 9); //取消置顶
     }
 
     public void destroyed(){

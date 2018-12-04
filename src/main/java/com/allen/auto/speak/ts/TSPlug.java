@@ -1,4 +1,4 @@
-package com.allen.auto.speak.utils;
+package com.allen.auto.speak.ts;
 
 import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.Dispatch;

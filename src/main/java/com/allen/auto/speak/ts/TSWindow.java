@@ -1,4 +1,4 @@
-package com.allen.auto.speak.utils;
+package com.allen.auto.speak.ts;
 
 import com.jacob.com.Dispatch;
 
@@ -62,7 +62,7 @@ public class TSWindow extends TSPlug {
      * @return
      */
     public static boolean setState(int hwnd, int flag) {
-        return Dispatch.call(com, "GetWindowState", hwnd, flag).getInt()==1;
+        return Dispatch.call(com, "SetWindowState", hwnd, flag).getInt()==1;
     }
 
     /**

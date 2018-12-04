@@ -1,8 +1,6 @@
 package com.allen.auto.speak;
 
-import com.allen.auto.speak.ts.TSPlug;
 import com.allen.auto.speak.ts.TSWindow;
-import com.jacob.com.Dispatch;
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
 
@@ -14,10 +12,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 /**
- * 自动喊话器_通用版v1.0.0
- * CreateBy Allen 2018.11.27
+ * 自动喊话器_通用版v2.0.0
+ * CreateBy Allen 2018.12.4
  */
-public class Main extends JFrame implements ActionListener {
+public class AutoSpeakMain extends JFrame implements ActionListener {
 
     private static final int GLOBAL_HOT_KEY_START = 0;
     private static final int GLOBAL_HOT_KEY_STOP = 1;
@@ -34,18 +32,18 @@ public class Main extends JFrame implements ActionListener {
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Main();
+                new AutoSpeakMain();
             }
         });
     }
 
-    public Main() {
+    public AutoSpeakMain() {
         init();
     }
 
     //初始化程序
     private void init() {
-        final Main main = this;
+        final AutoSpeakMain main = this;
 
         //注册热键
         JIntellitype.getInstance().registerHotKey(GLOBAL_HOT_KEY_START, JIntellitype.MOD_SHIFT + JIntellitype.MOD_CONTROL, F1);
@@ -81,7 +79,7 @@ public class Main extends JFrame implements ActionListener {
         jPanel.add(jTextField2);
 
 
-        jTextArea = new JTextArea(7, 26);
+        jTextArea = new JTextArea(8, 26);
         jTextArea.setText("Please input contents...");
         jTextArea.setLineWrap(true); //激活自动换行功能
         jTextArea.setWrapStyleWord(true);    //激活断行不断字功能
@@ -136,7 +134,7 @@ public class Main extends JFrame implements ActionListener {
                 }
             }
         });
-        main.setTitle("AS");
+        main.setTitle("ASC");
         main.setSize(315, 240);
         main.setVisible(true);
         main.setLocationRelativeTo(null);
